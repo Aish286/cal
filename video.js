@@ -1,48 +1,55 @@
-document.addEventListener("DOMContentLoaded", function () {
-    const filterButtons = document.querySelectorAll(".filter-buttons li");
-    const courses = document.querySelectorAll(".course");
-  
-    filterButtons.forEach((btn) => {
-      btn.addEventListener("click", () => {
-        const category = btn.getAttribute("data-category");
-  
-        courses.forEach((course) => {
-          if (category === "Simple Calculator" || course.getAttribute("data-category") === category) {
-            course.style.display = "block";
-          } else {
-            course.style.display = "none";
-          }
-        });
-      });
-    });
-  });
-  const display = document.getElementById('display');
+let history = [];
 
-function appendNumber(number) {
-  display.value += number;
+function appendNumber(num, type) {
+  document.getElementById(`${type}-display`).value += num;
 }
 
-function appendOperator(operator) {
-  const lastChar = display.value.slice(-1);
-  if ("+-*/".includes(lastChar)) {
-    display.value = display.value.slice(0, -1) + operator;
-  } else {
-    display.value += operator;
-  }
+function appendOperator(op, type) {
+  document.getElementById(`${type}-display`).value += op;
 }
 
-function clearDisplay() {
-  display.value = '';
+function appendFunction(func, type) {
+  document.getElementById(`${type}-display`).value += func;
 }
 
-function deleteLast() {
+function clearDisplay(type) {
+  document.getElementById(`${type}-display`).value = '';
+}
+
+function deleteLast(type) {
+  let display = document.getElementById(`${type}-display`);
   display.value = display.value.slice(0, -1);
 }
 
-function calculate() {
+function calculate(type) {
+  let display = document.getElementById(`${type}-display`);
   try {
-    display.value = eval(display.value).toString();
+    let result = eval(display.value);
+    addToHistory(display.value + ' = ' + result);
+    display.value = result;
   } catch {
     display.value = 'Error';
   }
 }
+
+function addToHistory(entry) {
+  history.push(entry);
+  let list = document.getElementById('history-list');
+  let item = document.createElement('li');
+  item.textContent = entry;
+  list.appendChild(item);
+}
+
+// Slider/Tab Switch
+document.querySelectorAll('.filter-buttons li').forEach(button => {
+  button.addEventListener('click', () => {
+    const category = button.getAttribute('data-category');
+
+    document.querySelectorAll('.filter-buttons li').forEach(btn => btn.classList.remove('active'));
+    button.classList.add('active');
+
+    document.querySelectorAll('.content-section').forEach(section => {
+      section.style.display = section.id === category ? 'block' : 'none';
+    });
+  });
+});
